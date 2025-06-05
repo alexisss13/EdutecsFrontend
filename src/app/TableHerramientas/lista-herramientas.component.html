@@ -1,0 +1,53 @@
+<div class="lista-herramientas-container">
+  <div class="lista-header">
+    <div class="lista-filtros">
+      <label class="filtro-mostrar">
+        Mostrar
+        <select [(ngModel)]="pageSize" (change)="onFilterChange()">
+          <option *ngFor="let n of [5,10,15,20]" [value]="n">{{n}}</option>
+        </select>
+        herramientas
+      </label>
+      <div class="filtros-derecha">
+        <select [(ngModel)]="carreraSeleccionada" (change)="onFilterChange()">
+          <option value="">Carrera</option>
+          <option *ngFor="let carrera of carreras" [value]="carrera.nombre">{{carrera.nombre}}</option>
+        </select>
+        <input type="text" [(ngModel)]="busqueda" (input)="onFilterChange()" placeholder="Buscar..." />
+      </div>
+    </div>
+  </div>
+
+  <table *ngIf="tecnicas" class="tabla-herramientas">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Explicación</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tecnica of tecnicas">
+        <td>{{tecnica.nombre}}</td>
+        <td>{{tecnica.descripcion}}</td>
+        <td>{{tecnica.explicacion}}</td>
+      </tr>
+      <tr *ngIf="tecnicas.length === 0">
+        <td colspan="3" class="no-data">No se encontraron resultados.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="paginacion">
+    <button (click)="cambiarPagina(paginaActual-1)" [disabled]="paginaActual === 1">Anterior</button>
+    <button *ngFor="let p of paginas" [class.active]="p === paginaActual" (click)="cambiarPagina(p)">{{p}}</button>
+    <button (click)="cambiarPagina(paginaActual+1)" [disabled]="paginaActual === totalPaginas">Siguiente</button>
+  </div>
+
+
+  <div class="info-paginacion">
+    Mostrando herramientas del {{(paginaActual-1)*pageSize+1}} al {{(paginaActual-1)*pageSize + tecnicas.length}} de un
+    total de {{totalTecnicas}} herramientas
+  </div>
+
+</div>

@@ -1,0 +1,44 @@
+/* Contenedor principal */
+.contenido {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+
+/* Contenedor para instrucciones y formulario juntos */
+.panel-instrucciones-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1 1 400px;
+  min-width: 320px;
+  margin-left: 0;
+}
+
+/* Result panel al lado derecho */
+app-result-panel {
+  flex: 1 1 450px;
+  min-width: 320px;
+  margin-top: 0;
+}
+
+/* Media queries para pantallas pequeñas */
+@media (max-width: 768px) {
+  .contenido {
+    flex-direction: column;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .panel-instrucciones-form,
+  app-result-panel {
+    flex: 1 1 100%;
+    min-width: auto;
+    margin-left: 0;
+    margin-top: 0; /* Para que estén pegados verticalmente */
+  }
+}

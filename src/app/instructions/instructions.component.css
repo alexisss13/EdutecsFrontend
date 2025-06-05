@@ -1,0 +1,67 @@
+.instructions-container {
+  max-width: 450px;          
+  margin: 0 auto 24px auto; 
+  padding: 0 32px 0 90px;    
+  box-sizing: border-box;
+  text-align: left;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.instructions-title {
+  font-weight: normal;
+  font-size: 1rem;
+  margin: 0 0 8px 0;
+  white-space: nowrap;      
+}
+
+.instructions-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.instructions-list li {
+  white-space: nowrap;       
+  margin-bottom: 6px;
+}
+
+.highlight {
+  color: #00B2E3;
+  font-weight: bold;
+}
+
+/* Media query para pantallas pequeñas (móviles y tablets) */
+@media (max-width: 768px) {
+  .instructions-container {
+    max-width: 100%;         /* ocupar todo el ancho disponible */
+    padding: 0 16px;         
+  }
+
+  .instructions-title,
+  .instructions-list li {
+    white-space: normal;     /* permitir salto de línea para mejor lectura */
+  }
+
+  .instructions-title {
+    font-size: 1rem;
+  }
+
+  .instructions-list li {
+    font-size: 0.95rem;
+  }
+}
+
+/* Ajustes adicionales para móviles muy pequeños */
+@media (max-width: 414px) {
+  .instructions-container {
+    padding: 0 12px;
+  }
+
+  .instructions-title {
+    font-size: 0.95rem;
+  }
+
+  .instructions-list li {
+    font-size: 0.9rem;
+  }
+}

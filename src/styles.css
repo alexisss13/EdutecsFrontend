@@ -1,0 +1,61 @@
+/* Reset básico y box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Estilos base para html y body */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f9f9f9;
+  color: #222;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Contenedor general para centrar y limitar ancho */
+.contenido {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 10px 20px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Para que los paneles se alineen bien y tengan espacio */
+app-form-panel, app-result-panel {
+  flex: 1 1 450px; /* ancho base 450px, crece o encoge */
+  min-width: 320px;
+}
+
+/* Botones básicos para toda la app (puedes extenderlos o personalizarlos) */
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+/* Opcional: estilos para links, inputs, etc. que uses */
+input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+app-header {
+  display: block; /* para asegurarte que toma todo el ancho */
+  width: 100vw;   /* ancho total de la ventana */
+  box-sizing: border-box;
+  background-color: #f6f6f6; /* mismo color que header-container para evitar espacios */
+  overflow-x: hidden; /* evitar scroll horizontal */
+}

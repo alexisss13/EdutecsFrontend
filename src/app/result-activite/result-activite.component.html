@@ -1,0 +1,54 @@
+<div class="resultado-actividad-container">
+  <div class="resultado-layout">
+
+    <!-- Columna Izquierda -->
+    <div class="resultado-izquierda">
+      <img src="assets/profesora.png" alt="Personaje" class="result-personaje" />
+      <button class="btn-descargar">Descargar PDF</button>
+    </div>
+
+    <!-- Columna Derecha -->
+    <div class="resultado-derecha">
+      <button class="btn-nueva-busqueda" (click)="onNuevaBusqueda()">Nueva Búsqueda</button>
+
+      <div class="paneles-acordeon">
+
+        <!-- Mensaje cuando no hay técnicas -->
+        <div *ngIf="tecnicas.length === 0" class="no-resultados">
+          <p>No se encontraron técnicas que coincidan con tus criterios de búsqueda.</p>
+        </div>
+
+        <!-- Panel dinámico para cada técnica encontrada -->
+        <div class="panel" [ngClass]="{
+       'panel-morado': i % 3 === 0,
+       'panel-azul': i % 3 === 1,
+       'panel-verde': i % 3 === 2 }" *ngFor="let tecnica of tecnicas; let i = index">
+          <div class="panel-header" (click)="togglePanel(i)">
+            <!-- Icono dinámico según el tipo de herramienta -->
+            <img [src]="getIconoTecnica(i)" [alt]="'Icono ' + tecnica.nombre" class="icono-img" />
+            <span class="panel-title">{{ tecnica.nombre }}</span>
+            <span class="chevron" [class.open]="panelAbierto[i]">&#9660;</span>
+          </div>
+          <div class="panel-content" [class.open]="panelAbierto[i]">
+            <p class="tecnica-descripcion">{{ tecnica.descripcion }}</p>
+
+            <!-- Explicación adicional si existe -->
+            <div *ngIf="tecnica.explicacion" class="tecnica-explicacion">
+              <h4>Cómo Funciona:</h4>
+              <p>{{ tecnica.explicacion }}</p>
+            </div>
+
+            <!-- Enlace atractivo -->
+            <div *ngIf="tecnica.link_externo" class="enlace-container">
+              <a [href]="tecnica.link_externo" target="_blank" class="enlace-atractivo">
+                <span class="enlace-texto">🚀 Conoce más acerca de esta herramienta</span>
+                <span class="enlace-arrow">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="result-panel" [class.active]="haySelecciones()">
+  <h2 class="result-title">Kit de Herramientas</h2>
+  <p class="result-subtitle" *ngIf="!haySelecciones()">Aquí aparecerán las opciones que elijas</p>
+  <img src="assets/personaje.png" class="result-personaje" alt="Personaje" />
+
+  <ng-container *ngIf="haySelecciones()">
+    <div class="result-list">
+      <div class="result-item" *ngFor="let item of seleccionesOrdenadas">
+        {{ item.opcion }}
+      </div>
+    </div>
+    <p class="info-text">Si ya armaste tu caja, dale clic a "Buscar actividad"</p>
+    <div class="result-buttons">
+      <button class="btn-primary" (click)="onBuscarActividad()">Buscar actividad</button>
+      <button class="btn-secondary" (click)="reset()">Volver a iniciar</button>
+    </div>
+  </ng-container>
+</div>

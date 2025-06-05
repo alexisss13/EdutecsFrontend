@@ -1,0 +1,16 @@
+<app-header></app-header>
+<app-tabs></app-tabs>
+
+<div class="contenido">
+  <div class="panel-instrucciones-form" *ngIf="!mostrarResultado && !mostrarListado">
+    <app-instructions *ngIf="mostrarInstrucciones"></app-instructions>
+    <app-form-panel (buscarActividad)="onBuscarActividad()"></app-form-panel>
+  </div>
+
+  <app-result-panel *ngIf="!mostrarResultado && !mostrarListado" (buscarActividad)="onBuscarActividad()"></app-result-panel>
+
+  <app-result-activite *ngIf="mostrarResultado && !mostrarListado" (nuevaBusqueda)="onNuevaBusqueda()"></app-result-activite>
+
+  <!-- Mostrar listado solo si mostrarListado es true -->
+  <router-outlet *ngIf="mostrarListado"></router-outlet>
+</div>
