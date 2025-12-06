@@ -10,7 +10,7 @@ import { Paginacion } from '../models/Paginacion';
 })
 export class ApiService {
 
-  apiUrl = 'https://edutecs.pythonanywhere.com/api/';
+  apiUrl = 'http://127.0.0.1:8000/api/';
 
   constructor(private http: HttpClient) { }
 
