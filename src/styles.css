@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* Reset básico y box-sizing */
 *, *::before, *::after {
   box-sizing: border-box;
