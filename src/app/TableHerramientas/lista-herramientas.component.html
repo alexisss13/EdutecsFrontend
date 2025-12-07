@@ -1,53 +1,123 @@
-<div class="lista-herramientas-container">
-  <div class="lista-header">
-    <div class="lista-filtros">
-      <label class="filtro-mostrar">
-        Mostrar
-        <select [(ngModel)]="pageSize" (change)="onFilterChange()">
-          <option *ngFor="let n of [5,10,15,20]" [value]="n">{{n}}</option>
-        </select>
-        herramientas
-      </label>
-      <div class="filtros-derecha">
-        <select [(ngModel)]="carreraSeleccionada" (change)="onFilterChange()">
-          <option value="">Carrera</option>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="card-glass overflow-hidden shadow-2xl">
+    
+    <!-- Header con filtros -->
+    <div class="p-4 bg-gradient-to-r from-gray-50/80 to-white border-b border-gray-200/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
+      <div>
+        <h2 class="text-base font-semibold text-gray-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          Directorio de Herramientas
+        </h2>
+        <p class="text-gray-500 text-xs mt-0.5">Explora todas las herramientas didácticas disponibles</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2.5 w-full lg:w-auto">
+        <select 
+          [(ngModel)]="carreraSeleccionada" 
+          (change)="onFilterChange()"
+          class="bg-white/80 backdrop-blur-xl border border-gray-300 text-gray-700 text-xs rounded-xl focus:ring-2 focus:ring-primary focus:border-primary block w-full sm:w-56 px-3 py-2 shadow-sm outline-none transition-all"
+        >
+          <option value="">Todas las Carreras</option>
           <option *ngFor="let carrera of carreras" [value]="carrera.nombre">{{carrera.nombre}}</option>
         </select>
-        <input type="text" [(ngModel)]="busqueda" (input)="onFilterChange()" placeholder="Buscar..." />
+        
+        <div class="relative w-full sm:w-64">
+          <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="busqueda" 
+            (input)="onFilterChange()" 
+            class="bg-white/80 backdrop-blur-xl border border-gray-300 text-gray-700 text-xs rounded-xl focus:ring-2 focus:ring-primary focus:border-primary block w-full pl-9 pr-3 py-2 shadow-sm outline-none transition-all" 
+            placeholder="Buscar herramienta..." 
+          />
+        </div>
       </div>
     </div>
+
+    <!-- Grid de Tarjetas (en lugar de tabla) -->
+    <div class="p-4 bg-gradient-to-b from-white to-gray-50/30">
+      <div *ngIf="tecnicas && tecnicas.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div 
+          *ngFor="let tecnica of tecnicas; let i = index" 
+          class="card-clean p-3 hover:scale-[1.01] transition-all duration-300 group"
+        >
+          <div class="flex items-start gap-2.5">
+            <div 
+              class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110"
+              [ngClass]="{
+                'bg-gradient-to-br from-purple-100 to-purple-50 text-purple-600 shadow-purple-200': i % 4 === 0,
+                'bg-gradient-to-br from-blue-100 to-blue-50 text-blue-600 shadow-blue-200': i % 4 === 1,
+                'bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 shadow-emerald-200': i % 4 === 2,
+                'bg-gradient-to-br from-amber-100 to-amber-50 text-amber-600 shadow-amber-200': i % 4 === 3
+              }"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+            </div>
+            
+            <div class="flex-1 min-w-0">
+              <h3 class="text-xs font-semibold text-primary mb-1 group-hover:text-primary-dark transition-colors leading-tight">
+                {{tecnica.nombre}}
+              </h3>
+              <p class="text-gray-600 text-[11px] leading-relaxed mb-1.5">
+                {{tecnica.descripcion}}
+              </p>
+              <p *ngIf="tecnica.explicacion" class="text-gray-500 text-[10px] italic leading-relaxed border-l-2 border-gray-200 pl-2">
+                {{tecnica.explicacion}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay resultados -->
+      <div *ngIf="!tecnicas || tecnicas.length === 0" class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-gray-400 text-base">No se encontraron resultados</p>
+        <p class="text-gray-400 text-xs mt-1">Intenta con otros filtros de búsqueda</p>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="p-4 bg-gradient-to-r from-gray-50/80 to-white border-t border-gray-200/50 flex justify-center items-center gap-1.5">
+      <button 
+        (click)="cambiarPagina(paginaActual-1)" 
+        [disabled]="paginaActual === 1"
+        class="px-3 py-1.5 rounded-lg bg-white/80 backdrop-blur-xl border border-gray-300 text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white hover:shadow-md transition-all duration-200 font-medium text-xs"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      
+      <button 
+        *ngFor="let p of paginas" 
+        (click)="cambiarPagina(p)"
+        class="w-8 h-8 rounded-lg flex items-center justify-center font-semibold text-xs transition-all duration-200"
+        [ngClass]="p === paginaActual 
+          ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/40 scale-105' 
+          : 'bg-white/80 backdrop-blur-xl text-gray-600 hover:bg-white hover:shadow-md border border-gray-200'"
+      >
+        {{p}}
+      </button>
+
+      <button 
+        (click)="cambiarPagina(paginaActual+1)" 
+        [disabled]="paginaActual === totalPaginas"
+        class="px-3 py-1.5 rounded-lg bg-white/80 backdrop-blur-xl border border-gray-300 text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white hover:shadow-md transition-all duration-200 font-medium text-xs"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+
   </div>
-
-  <table *ngIf="tecnicas" class="tabla-herramientas">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Explicación</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let tecnica of tecnicas">
-        <td>{{tecnica.nombre}}</td>
-        <td>{{tecnica.descripcion}}</td>
-        <td>{{tecnica.explicacion}}</td>
-      </tr>
-      <tr *ngIf="tecnicas.length === 0">
-        <td colspan="3" class="no-data">No se encontraron resultados.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="paginacion">
-    <button (click)="cambiarPagina(paginaActual-1)" [disabled]="paginaActual === 1">Anterior</button>
-    <button *ngFor="let p of paginas" [class.active]="p === paginaActual" (click)="cambiarPagina(p)">{{p}}</button>
-    <button (click)="cambiarPagina(paginaActual+1)" [disabled]="paginaActual === totalPaginas">Siguiente</button>
-  </div>
-
-
-  <div class="info-paginacion">
-    Mostrando herramientas del {{(paginaActual-1)*pageSize+1}} al {{(paginaActual-1)*pageSize + tecnicas.length}} de un
-    total de {{totalTecnicas}} herramientas
-  </div>
-
 </div>

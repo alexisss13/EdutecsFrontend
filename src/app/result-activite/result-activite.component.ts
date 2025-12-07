@@ -9,7 +9,6 @@ import { SeleccionService } from '../seleccion.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './result-activite.component.html',
-  styleUrls: ['./result-activite.component.css']
 })
 export class ResultActiviteComponent {
   @Output() nuevaBusqueda = new EventEmitter<void>();

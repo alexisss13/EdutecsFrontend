@@ -1,11 +1,35 @@
-<header class="header-container">
-  <div class="header-inner">
-    <div class="header-content">
-      <img src="assets/Tecsup.png" alt="Tecsup Logo" class="logo" />
-      <h2 class="header-title">¡Encuentra la herramienta ideal para tus clases!</h2>
-    </div>
-    <div class="header-image">
-      <img src="assets/logoimagen.png" alt="Imagen decorativa" />
+<header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-2xl border-b border-gray-200/50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between py-2.5 gap-4">
+      
+      <!-- Logo y Título -->
+      <div class="flex items-center gap-3">
+        <img src="assets/Tecsup.png" alt="Tecsup Logo" class="h-8 w-auto object-contain" />
+        <div class="hidden md:block w-px h-6 bg-gray-300/50"></div>
+        <h1 class="hidden md:block text-sm font-medium text-gray-700 tracking-tight">
+          Herramientas Didácticas
+        </h1>
+      </div>
+
+      <!-- Navegación con estilo Apple -->
+      <nav class="flex gap-1.5 p-1 bg-gray-100/80 backdrop-blur-xl rounded-xl shadow-inner">
+        <a 
+          routerLink="/" 
+          routerLinkActive="bg-white text-primary shadow-md" 
+          [routerLinkActiveOptions]="{exact:true}"
+          class="px-4 py-1.5 rounded-lg text-xs font-semibold text-gray-600 transition-all duration-200 hover:text-primary hover:bg-white/50"
+        >
+          Kit de Herramientas
+        </a>
+        <a 
+          routerLink="/lista-herramientas" 
+          routerLinkActive="bg-white text-primary shadow-md"
+          class="px-4 py-1.5 rounded-lg text-xs font-semibold text-gray-600 transition-all duration-200 hover:text-primary hover:bg-white/50"
+        >
+          Directorio
+        </a>
+      </nav>
+    
     </div>
   </div>
 </header>

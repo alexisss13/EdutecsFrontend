@@ -16,7 +16,6 @@ interface Pregunta {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './form-panel.component.html',
-  styleUrls: ['./form-panel.component.css']
 })
 export class FormPanelComponent implements OnInit {
   expandedIndex: number | null = null;

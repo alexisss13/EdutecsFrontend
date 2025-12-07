@@ -8,7 +8,6 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './result-panel.component.html',
-  styleUrls: ['./result-panel.component.css']
 })
 export class ResultPanelComponent implements OnInit, OnDestroy {
   @Output() buscarActividad = new EventEmitter<void>();

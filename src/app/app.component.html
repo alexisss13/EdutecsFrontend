@@ -1,16 +1,32 @@
 <app-header></app-header>
-<app-tabs></app-tabs>
 
-<div class="contenido">
-  <div class="panel-instrucciones-form" *ngIf="!mostrarResultado && !mostrarListado">
-    <app-instructions *ngIf="mostrarInstrucciones"></app-instructions>
-    <app-form-panel (buscarActividad)="onBuscarActividad()"></app-form-panel>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
+  
+  <!-- Vista principal: Formulario y Resultados -->
+  <div class="flex flex-col lg:flex-row gap-8 items-start" *ngIf="!mostrarResultado && !mostrarListado">
+    
+    <!-- Panel Izquierdo: Instrucciones + Formulario -->
+    <div class="flex-1 w-full lg:max-w-2xl flex flex-col gap-6">
+      <app-instructions *ngIf="mostrarInstrucciones"></app-instructions>
+      <app-form-panel (buscarActividad)="onBuscarActividad()"></app-form-panel>
+    </div>
+
+    <!-- Panel Derecho: Resumen de Selección -->
+    <div class="flex-1 w-full lg:max-w-md">
+      <app-result-panel (buscarActividad)="onBuscarActividad()"></app-result-panel>
+    </div>
+
   </div>
 
-  <app-result-panel *ngIf="!mostrarResultado && !mostrarListado" (buscarActividad)="onBuscarActividad()"></app-result-panel>
+  <!-- Vista de Resultados de Actividad -->
+  <app-result-activite 
+    *ngIf="mostrarResultado && !mostrarListado" 
+    (nuevaBusqueda)="onNuevaBusqueda()">
+  </app-result-activite>
 
-  <app-result-activite *ngIf="mostrarResultado && !mostrarListado" (nuevaBusqueda)="onNuevaBusqueda()"></app-result-activite>
+  <!-- Vista de Listado de Herramientas -->
+  <div *ngIf="mostrarListado" class="animate-fade-in-up">
+    <router-outlet></router-outlet>
+  </div>
 
-  <!-- Mostrar listado solo si mostrarListado es true -->
-  <router-outlet *ngIf="mostrarListado"></router-outlet>
-</div>
+</main>

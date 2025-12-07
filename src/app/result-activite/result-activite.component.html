@@ -1,54 +1,131 @@
-<div class="resultado-actividad-container">
-  <div class="resultado-layout">
+<div class="container mx-auto px-4 py-8 animate-fade-in">
+  <div class="flex flex-col lg:flex-row gap-10 items-start">
 
-    <!-- Columna Izquierda -->
-    <div class="resultado-izquierda">
-      <img src="assets/profesora.png" alt="Personaje" class="result-personaje" />
-      <button class="btn-descargar">Descargar PDF</button>
+    <!-- Columna Izquierda: Imagen y Botón -->
+    <div class="lg:w-1/4 flex flex-col items-center lg:sticky lg:top-28 gap-6">
+      <div class="relative group">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full blur-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-700"></div>
+        <img 
+          src="assets/profesora.png" 
+          alt="Personaje" 
+          class="relative w-64 h-auto object-contain drop-shadow-2xl z-10 hover:scale-105 transition-transform duration-500" 
+        />
+      </div>
+      
+      <button class="btn-liquid w-full max-w-[220px] py-3.5 text-sm group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span>Descargar PDF</span>
+      </button>
     </div>
 
-    <!-- Columna Derecha -->
-    <div class="resultado-derecha">
-      <button class="btn-nueva-busqueda" (click)="onNuevaBusqueda()">Nueva Búsqueda</button>
-
-      <div class="paneles-acordeon">
-
-        <!-- Mensaje cuando no hay técnicas -->
-        <div *ngIf="tecnicas.length === 0" class="no-resultados">
-          <p>No se encontraron técnicas que coincidan con tus criterios de búsqueda.</p>
-        </div>
-
-        <!-- Panel dinámico para cada técnica encontrada -->
-        <div class="panel" [ngClass]="{
-       'panel-morado': i % 3 === 0,
-       'panel-azul': i % 3 === 1,
-       'panel-verde': i % 3 === 2 }" *ngFor="let tecnica of tecnicas; let i = index">
-          <div class="panel-header" (click)="togglePanel(i)">
-            <!-- Icono dinámico según el tipo de herramienta -->
-            <img [src]="getIconoTecnica(i)" [alt]="'Icono ' + tecnica.nombre" class="icono-img" />
-            <span class="panel-title">{{ tecnica.nombre }}</span>
-            <span class="chevron" [class.open]="panelAbierto[i]">&#9660;</span>
-          </div>
-          <div class="panel-content" [class.open]="panelAbierto[i]">
-            <p class="tecnica-descripcion">{{ tecnica.descripcion }}</p>
-
-            <!-- Explicación adicional si existe -->
-            <div *ngIf="tecnica.explicacion" class="tecnica-explicacion">
-              <h4>Cómo Funciona:</h4>
-              <p>{{ tecnica.explicacion }}</p>
-            </div>
-
-            <!-- Enlace atractivo -->
-            <div *ngIf="tecnica.link_externo" class="enlace-container">
-              <a [href]="tecnica.link_externo" target="_blank" class="enlace-atractivo">
-                <span class="enlace-texto">🚀 Conoce más acerca de esta herramienta</span>
-                <span class="enlace-arrow">→</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
+    <!-- Columna Derecha: Resultados -->
+    <div class="lg:w-3/4 w-full flex flex-col gap-6">
+      
+      <!-- Header con botón de nueva búsqueda -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 card-glass p-4">
+        <h3 class="text-base font-semibold text-gray-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Resultados Encontrados
+        </h3>
+        <button 
+          class="btn-glass-ghost px-5 py-2 text-xs" 
+          (click)="onNuevaBusqueda()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Nueva Búsqueda
+        </button>
       </div>
+
+      <!-- Tarjetas de Técnicas -->
+      <div class="flex flex-col gap-5">
+        <div 
+          class="card-clean overflow-hidden group hover:scale-[1.01] transition-all duration-300"
+          *ngFor="let tecnica of tecnicas; let i = index"
+        >
+          <!-- Header de la tarjeta -->
+          <div 
+            class="flex items-center gap-4 p-5 cursor-pointer bg-gradient-to-r from-white to-gray-50/30 hover:from-blue-50/20 hover:to-blue-50/10 transition-all duration-300"
+            (click)="togglePanel(i)"
+          >
+            <div 
+              class="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110"
+              [ngClass]="{
+                'bg-gradient-to-br from-indigo-100 to-indigo-50 text-indigo-600 shadow-indigo-200': i % 3 === 0,
+                'bg-gradient-to-br from-sky-100 to-sky-50 text-sky-600 shadow-sky-200': i % 3 === 1,
+                'bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 shadow-emerald-200': i % 3 === 2
+              }"
+            >
+              <img [src]="getIconoTecnica(i)" class="w-6 h-6 object-contain" [alt]="tecnica.nombre" />
+            </div>
+
+            <div class="flex-1">
+              <h3 class="text-base font-semibold text-gray-800 group-hover:text-primary transition-colors">
+                {{ tecnica.nombre }}
+              </h3>
+              <p class="text-gray-400 text-xs mt-0.5" *ngIf="!panelAbierto[i]">Clic para ver más información...</p>
+            </div>
+
+            <button 
+              class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm"
+              [class.rotate-180]="panelAbierto[i]"
+              [class.bg-primary]="panelAbierto[i]"
+              [class.text-white]="panelAbierto[i]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Contenido expandible -->
+          <div 
+            class="transition-all duration-500 ease-in-out bg-gradient-to-b from-gray-50/50 to-white"
+            [class.max-h-0]="!panelAbierto[i]"
+            [class.max-h-[1200px]]="panelAbierto[i]"
+            [class.overflow-hidden]="!panelAbierto[i]"
+          >
+            <div class="p-6 pt-4 flex flex-col gap-4 border-t border-gray-100">
+              <p class="text-gray-700 leading-relaxed text-sm">
+                {{ tecnica.descripcion }}
+              </p>
+
+              <div *ngIf="tecnica.explicacion" class="card-glass p-4 relative overflow-hidden">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-primary-light rounded-r-full"></div>
+                <h4 class="text-primary font-semibold mb-2 flex items-center gap-2 text-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  Cómo funciona
+                </h4>
+                <p class="text-gray-600 leading-relaxed text-xs">{{ tecnica.explicacion }}</p>
+              </div>
+
+              <div *ngIf="tecnica.link_externo" class="text-center mt-1">
+                <a 
+                  [href]="tecnica.link_externo" 
+                  target="_blank" 
+                  class="btn-liquid inline-flex px-6 py-2.5 rounded-full group text-xs"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  </svg>
+                  <span>Explorar Herramienta</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

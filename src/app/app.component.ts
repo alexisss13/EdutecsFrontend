@@ -23,7 +23,6 @@ import { ResultActiviteComponent } from './result-activite/result-activite.compo
     ResultActiviteComponent
   ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   mostrarResultado = false;

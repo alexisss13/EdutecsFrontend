@@ -1,30 +1,71 @@
-<div class="accordion">
+<div class="flex flex-col gap-4 w-full">
   <div
-    class="accordion-item"
+    class="card-clean overflow-hidden group transition-all duration-300"
     *ngFor="let pregunta of getPreguntasParaMostrar(); let i = index"
+    [ngClass]="{ 'ring-2 ring-primary/40 border-primary/40 shadow-xl': isExpanded(i) }"
   >
+    <!-- Header de la pregunta -->
     <div
-      class="accordion-header"
+      class="flex items-center gap-2.5 p-3 cursor-pointer select-none bg-gradient-to-r from-white to-gray-50/50 hover:from-blue-50/30 hover:to-blue-50/10 transition-all duration-300"
       (click)="togglePanel(i)"
-      style="cursor: pointer;"
     >
-      <img *ngIf="pregunta.icono" [src]="pregunta.icono" alt="{{pregunta.texto}}" class="icono" />
-      <span class="pregunta-texto">{{ pregunta.texto }}</span>
-      <span class="arrow" [class.rotated]="isExpanded(i)"></span>
-
+      <div 
+        class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 shadow-sm"
+        [ngClass]="isExpanded(i) ? 'bg-primary/15 text-primary scale-110 shadow-lg shadow-primary/20' : 'bg-gray-100 text-gray-400 group-hover:bg-primary/10 group-hover:text-primary'"
+      >
+        <img *ngIf="pregunta.icono" [src]="pregunta.icono" class="w-5 h-5 object-contain" alt="Icono" />
+        <svg *ngIf="!pregunta.icono && pregunta.esOtrasOpciones" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      </div>
+      
+      <span class="flex-1 text-xs font-semibold text-gray-700 group-hover:text-primary transition-colors">
+        {{ pregunta.texto }}
+      </span>
+      
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        class="h-5 w-5 text-gray-400 transition-all duration-300"
+        [ngClass]="{ 'rotate-180 text-primary': isExpanded(i) }"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+      </svg>
     </div>
 
+    <!-- Contenido desplegable -->
     <div
-      class="accordion-body"
       *ngIf="isExpanded(i)"
+      class="bg-gradient-to-b from-gray-50/50 to-white px-3 pb-3 pt-2 border-t border-gray-100 animate-slide-down"
     >
-      <div
-        class="opcion"
-        *ngFor="let opcion of pregunta.opciones"
-        (click)="selectOpcion(pregunta, opcion)"
-        [class.selected]="isOpcionSeleccionada(pregunta, opcion)"
-      >
-        {{ opcion.nombre }}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div
+          class="relative px-2.5 py-2 rounded-lg border-2 cursor-pointer transition-all duration-200 flex items-center gap-2 group/option"
+          *ngFor="let opcion of pregunta.opciones"
+          (click)="selectOpcion(pregunta, opcion)"
+          [ngClass]="{
+            'border-primary bg-gradient-to-br from-blue-50 to-white shadow-md scale-[1.02]': isOpcionSeleccionada(pregunta, opcion),
+            'border-gray-200 bg-white hover:border-primary/40 hover:bg-blue-50/30 hover:shadow-sm': !isOpcionSeleccionada(pregunta, opcion)
+          }"
+        >
+          <!-- Radio button personalizado -->
+          <div 
+            class="w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+            [ngClass]="isOpcionSeleccionada(pregunta, opcion) ? 'border-primary bg-primary shadow-sm' : 'border-gray-300 group-hover/option:border-primary/50'"
+          >
+            <div 
+              class="w-1.5 h-1.5 bg-white rounded-full transition-transform duration-200" 
+              [ngClass]="isOpcionSeleccionada(pregunta, opcion) ? 'scale-100' : 'scale-0'"
+            ></div>
+          </div>
+          
+          <span 
+            class="font-medium text-[11px] transition-colors leading-tight"
+            [ngClass]="isOpcionSeleccionada(pregunta, opcion) ? 'text-primary' : 'text-gray-600 group-hover/option:text-gray-800'"
+          >
+            {{ opcion.nombre }}
+          </span>
+        </div>
       </div>
     </div>
   </div>

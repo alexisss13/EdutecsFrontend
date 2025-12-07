@@ -1,18 +1,61 @@
-<div class="result-panel" [class.active]="haySelecciones()">
-  <h2 class="result-title">Kit de Herramientas</h2>
-  <p class="result-subtitle" *ngIf="!haySelecciones()">Aquí aparecerán las opciones que elijas</p>
-  <img src="assets/personaje.png" class="result-personaje" alt="Personaje" />
+<div 
+  class="card-glass p-5 text-center flex flex-col gap-4 min-h-[480px] sticky top-24 shadow-2xl"
+>
+  <!-- Título -->
+  <div>
+    <h2 class="text-base font-semibold text-gray-800 tracking-tight">Tu Kit Didáctico</h2>
+    <div class="h-0.5 w-14 bg-gradient-to-r from-primary to-primary-light rounded-full mx-auto mt-1.5 shadow-sm"></div>
+  </div>
 
+  <!-- Estado vacío -->
+  <div *ngIf="!haySelecciones()" class="flex flex-col items-center justify-center flex-1 animate-fade-in">
+    <div class="relative">
+      <div class="absolute inset-0 bg-blue-100 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+      <img 
+        src="assets/personaje.png" 
+        class="relative w-44 h-auto object-contain opacity-90 hover:scale-105 transition-transform duration-500" 
+        alt="Personaje" 
+      />
+    </div>
+    <p class="text-gray-400 mt-6 font-medium text-xs">Selecciona opciones para comenzar</p>
+  </div>
+
+  <!-- Con selecciones -->
   <ng-container *ngIf="haySelecciones()">
-    <div class="result-list">
-      <div class="result-item" *ngFor="let item of seleccionesOrdenadas">
-        {{ item.opcion }}
+    <div class="flex flex-col gap-2.5 w-full animate-fade-in-up max-h-[260px] overflow-y-auto pr-2">
+      <div 
+        class="flex items-center gap-2.5 p-3 rounded-xl bg-gradient-to-r from-blue-50/80 to-blue-50/40 border border-blue-100/50 text-gray-700 font-medium text-xs text-left transition-all duration-300 hover:translate-x-1 hover:shadow-md group"
+        *ngFor="let item of seleccionesOrdenadas; let i = index"
+      >
+        <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-primary-dark text-white text-xs font-bold shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
+          {{ i + 1 }}
+        </span>
+        <span class="truncate text-gray-700">{{ item.opcion }}</span>
       </div>
     </div>
-    <p class="info-text">Si ya armaste tu caja, dale clic a "Buscar actividad"</p>
-    <div class="result-buttons">
-      <button class="btn-primary" (click)="onBuscarActividad()">Buscar actividad</button>
-      <button class="btn-secondary" (click)="reset()">Volver a iniciar</button>
+
+    <!-- Botones -->
+    <div class="mt-auto pt-5 w-full flex flex-col gap-3">
+      
+      <button 
+        class="btn-liquid py-3 px-5 text-sm w-full group"
+        (click)="onBuscarActividad()"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <span>Buscar Actividad</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </button>
+      
+      <button 
+        class="text-gray-400 hover:text-gray-600 text-xs font-medium transition-all duration-200 py-1.5 hover:scale-105"
+        (click)="reset()"
+      >
+        Borrar todo y reiniciar
+      </button>
     </div>
   </ng-container>
 </div>

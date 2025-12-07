@@ -6,7 +6,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './tabs.component.html',
-  styleUrl: './tabs.component.css'
 })
 export class TabsComponent {
 
