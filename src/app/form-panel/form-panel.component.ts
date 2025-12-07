@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeleccionService } from '../seleccion.service';
 import { Opcion } from '../models/Opcion';
+// Asegúrate de que la ruta sea correcta
+import { InstructionsComponent } from '../instructions/instructions.component';
 
 interface Pregunta {
   icono?: string;
@@ -14,7 +16,7 @@ interface Pregunta {
 @Component({
   selector: 'app-form-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, InstructionsComponent],
   templateUrl: './form-panel.component.html',
 })
 export class FormPanelComponent implements OnInit {
@@ -63,13 +65,11 @@ export class FormPanelComponent implements OnInit {
     }
   ];
 
-  // Cambiamos a arreglo para mantener orden
   selectedOpcionesOrdenadas: { pregunta: string; opcion: string }[] = [];
 
   constructor(private seleccionService: SeleccionService) {}
 
   ngOnInit(): void {
-    // Cargar opciones dinámicas desde la API
     this.cargarCarreras();
     this.cargarMomentos();
     this.cargarDuraciones();
@@ -119,7 +119,6 @@ export class FormPanelComponent implements OnInit {
   }
 
   private asignarOpciones(textoPregunta: string, opciones: any): void {
-    // Si viene paginado, extrae el array
     let opcionesArray = Array.isArray(opciones) ? opciones : opciones.results;
     if (!Array.isArray(opcionesArray)) opcionesArray = [];
     let pregunta = this.preguntas.find(p => p.texto === textoPregunta);
@@ -128,7 +127,6 @@ export class FormPanelComponent implements OnInit {
     }
     if (pregunta) {
       pregunta.opciones = opcionesArray;
-      // Forzar nueva referencia para que Angular detecte cambio
       if (pregunta.esSubOpcion) {
         this.subOpciones = [...this.subOpciones];
       } else {
@@ -136,8 +134,6 @@ export class FormPanelComponent implements OnInit {
       }
     }
   }
-
-
 
   getPreguntasParaMostrar(): Pregunta[] {
     if (this.reemplazoOtrasOpciones) {
@@ -151,7 +147,6 @@ export class FormPanelComponent implements OnInit {
   }
 
   togglePanel(index: number): void {
-    console.log('expandedIndex después de toggle:', this.expandedIndex);
     const preguntasActuales = this.getPreguntasParaMostrar();
     const pregunta = preguntasActuales[index];
 
@@ -167,9 +162,7 @@ export class FormPanelComponent implements OnInit {
     }
   }
 
-  ngAfterViewChecked() {
-    // Eliminamos la apertura automática para que subpaneles estén cerrados
-  }
+  ngAfterViewChecked() {}
 
   isExpanded(index: number): boolean {
     return this.expandedIndex === index;
@@ -184,7 +177,6 @@ export class FormPanelComponent implements OnInit {
       this.selectedOpcionesOrdenadas.push({ pregunta: pregunta.texto, opcion: opcion.nombre });
     }
 
-    // Notificar al servicio con objeto ordenado
     const seleccionesObj = this.selectedOpcionesOrdenadas.reduce((acc, cur) => {
       acc[cur.pregunta] = cur.opcion;
       return acc;
