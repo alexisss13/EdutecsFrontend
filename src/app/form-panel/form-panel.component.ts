@@ -84,6 +84,10 @@ export class FormPanelComponent implements OnInit {
     });
   }
 
+  getSeleccionParaPregunta(textoPregunta: string): string | null {
+    const seleccion = this.selectedOpcionesOrdenadas.find(s => s.pregunta === textoPregunta);
+    return seleccion ? seleccion.opcion : null;
+  }
   private cargarMomentos(): void {
     this.seleccionService.getMomentos().subscribe(momentos => {
       this.asignarOpciones('¿En qué momento de la clase usarás la actividad?', momentos);
