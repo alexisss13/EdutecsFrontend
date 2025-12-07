@@ -15,26 +15,26 @@ export class ListaHerramientasComponent implements OnInit {
 
   tecnicas: Tecnica[] = [];
   carreras: Opcion[] = [];
+  
+  // Variables de Paginación y Filtro
   paginaActual = 1;
   totalPaginas = 1;
   totalTecnicas = 0;
-  pageSize = 5;
+  pageSize = 6; // Ajustado a 6 para que la grilla 3x2 se vea bien
   carreraSeleccionada = '';
   busqueda = '';
   paginas: number[] = [];
 
+  // NUEVO: Variable para el Modal
+  tecnicaSeleccionada: Tecnica | null = null;
+
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
+    // Carga inicial (igual que antes)
     this.apiService.getCarrerasL().subscribe({
-      next: (data) => {
-        console.log('Carreras recibidas:', data);
-        this.carreras = data.results;
-      },
-      error: (err) => {
-        console.error('Error cargando carreras:', err);
-        this.carreras = [];
-      }
+      next: (data) => { this.carreras = data.results; },
+      error: () => { this.carreras = []; }
     });
     this.cargarTecnicas();
   }
@@ -66,10 +66,19 @@ export class ListaHerramientasComponent implements OnInit {
     if (pagina < 1 || pagina > this.totalPaginas) return;
     this.paginaActual = pagina;
     this.cargarTecnicas();
+    // Scroll suave hacia arriba al cambiar página
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Método helper para usar Math.min en el HTML
-  min(a: number, b: number): number {
-    return Math.min(a, b);
+  // NUEVO: Métodos para el Modal
+  abrirDetalle(tecnica: Tecnica): void {
+    this.tecnicaSeleccionada = tecnica;
+    // Evitar scroll del body cuando el modal está abierto
+    document.body.style.overflow = 'hidden';
+  }
+
+  cerrarDetalle(): void {
+    this.tecnicaSeleccionada = null;
+    document.body.style.overflow = 'auto';
   }
 }
