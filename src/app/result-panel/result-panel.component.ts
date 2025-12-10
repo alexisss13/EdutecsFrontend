@@ -26,11 +26,25 @@ export class ResultPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   haySelecciones(): boolean {
     return Object.keys(this.selecciones).length > 0;
+  }
+
+  // Método agregado para corregir el error
+  borrarSeleccion(pregunta: string) {
+    // 1. Creamos una copia de las selecciones actuales para no mutar directamente
+    const nuevasSelecciones = { ...this.selecciones };
+    
+    // 2. Eliminamos la selección específica
+    delete nuevasSelecciones[pregunta];
+    
+    // 3. Actualizamos el servicio con el nuevo objeto de selecciones
+    this.seleccionService.setSeleccionObj(nuevasSelecciones);
   }
 
   reset() {
