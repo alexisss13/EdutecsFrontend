@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeleccionService } from '../seleccion.service';
 import { Opcion } from '../models/Opcion';
-// Asegúrate de que la ruta sea correcta
+// Importaciones de tus componentes
 import { InstructionsComponent } from '../instructions/instructions.component';
+import { ResultPanelComponent } from '../result-panel/result-panel.component';
+import { ResultActiviteComponent } from '../result-activite/result-activite.component';
 
 interface Pregunta {
   icono?: string;
@@ -16,10 +18,20 @@ interface Pregunta {
 @Component({
   selector: 'app-form-panel',
   standalone: true,
-  imports: [CommonModule, InstructionsComponent],
+  // Agregamos ResultPanelComponent y ResultActiviteComponent aquí
+  imports: [
+    CommonModule, 
+    InstructionsComponent, 
+    ResultPanelComponent, 
+    ResultActiviteComponent
+  ],
   templateUrl: './form-panel.component.html',
 })
 export class FormPanelComponent implements OnInit {
+  
+  // Variable para controlar si mostramos el formulario o los resultados
+  mostrarResultados = false;
+
   expandedIndex: number | null = null;
   reemplazoOtrasOpciones = false; 
 
@@ -78,6 +90,22 @@ export class FormPanelComponent implements OnInit {
     this.cargarDificultades();
   }
 
+  // --- MÉTODOS PARA CONTROL DE VISTAS (NUEVOS) ---
+
+  onBuscar(): void {
+    this.mostrarResultados = true;
+    // Scroll suave al inicio para ver los resultados desde arriba
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  onResetBusqueda(): void {
+    this.mostrarResultados = false;
+    // Si quisieras limpiar los filtros al volver, descomenta esto:
+    // this.seleccionService.reset();
+  }
+
+  // --- FIN MÉTODOS NUEVOS ---
+
   private cargarCarreras(): void {
     this.seleccionService.getCarreras().subscribe((carreras) => {
       this.asignarOpciones('¿De qué carrera son tus estudiantes?', carreras);
@@ -88,6 +116,7 @@ export class FormPanelComponent implements OnInit {
     const seleccion = this.selectedOpcionesOrdenadas.find(s => s.pregunta === textoPregunta);
     return seleccion ? seleccion.opcion : null;
   }
+  
   private cargarMomentos(): void {
     this.seleccionService.getMomentos().subscribe(momentos => {
       this.asignarOpciones('¿En qué momento de la clase usarás la actividad?', momentos);

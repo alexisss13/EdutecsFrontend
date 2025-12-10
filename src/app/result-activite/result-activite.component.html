@@ -1,131 +1,100 @@
-<div class="container mx-auto px-4 py-8 animate-fade-in">
-  <div class="flex flex-col lg:flex-row gap-10 items-start">
-
-    <!-- Columna Izquierda: Imagen y Botón -->
-    <div class="lg:w-1/4 flex flex-col items-center lg:sticky lg:top-28 gap-6">
-      <div class="relative group">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full blur-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-700"></div>
-        <img 
-          src="assets/profesora.png" 
-          alt="Personaje" 
-          class="relative w-64 h-auto object-contain drop-shadow-2xl z-10 hover:scale-105 transition-transform duration-500" 
-        />
+<div class="animate-fade-in">
+  
+  <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider">Resultados</span>
+        <div class="h-px bg-gray-200 w-20"></div>
       </div>
-      
-      <button class="btn-liquid w-full max-w-[220px] py-3.5 text-sm group">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-        </svg>
-        <span>Descargar PDF</span>
-      </button>
+      <h2 class="text-3xl font-bold text-gray-800">Estrategias Recomendadas</h2>
+      <p class="text-gray-500 mt-2">Hemos encontrado estas herramientas basadas en tu perfil.</p>
     </div>
 
-    <!-- Columna Derecha: Resultados -->
-    <div class="lg:w-3/4 w-full flex flex-col gap-6">
-      
-      <!-- Header con botón de nueva búsqueda -->
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 card-glass p-4">
-        <h3 class="text-base font-semibold text-gray-800 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Resultados Encontrados
-        </h3>
-        <button 
-          class="btn-glass-ghost px-5 py-2 text-xs" 
-          (click)="onNuevaBusqueda()"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          Nueva Búsqueda
-        </button>
-      </div>
+    <button 
+      (click)="onNuevaBusqueda()"
+      class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Volver al filtro
+    </button>
+  </div>
 
-      <!-- Tarjetas de Técnicas -->
-      <div class="flex flex-col gap-5">
+  <div class="flex flex-col lg:flex-row gap-8">
+    
+    <div class="hidden lg:block w-1/4 sticky top-24 self-start text-center">
+      <div class="relative inline-block group">
+        <div class="absolute inset-0 bg-blue-200 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+        <img src="assets/profesora.png" class="relative z-10 w-full max-w-[200px] mx-auto drop-shadow-xl hover:scale-105 transition-transform duration-300" alt="Profesora">
+      </div>
+      <div class="mt-6 bg-blue-50 rounded-xl p-4 text-sm text-blue-800 border border-blue-100">
+        "¡Estas técnicas son ideales para fomentar el pensamiento crítico en tu grupo!"
+      </div>
+    </div>
+
+    <div class="flex-1 w-full">
+      <div class="grid grid-cols-1 gap-5">
+        
         <div 
-          class="card-clean overflow-hidden group hover:scale-[1.01] transition-all duration-300"
-          *ngFor="let tecnica of tecnicas; let i = index"
+          *ngFor="let tecnica of tecnicas; let i = index" 
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-blue-100 transition-all duration-300 overflow-hidden"
         >
-          <!-- Header de la tarjeta -->
           <div 
-            class="flex items-center gap-4 p-5 cursor-pointer bg-gradient-to-r from-white to-gray-50/30 hover:from-blue-50/20 hover:to-blue-50/10 transition-all duration-300"
+            class="p-6 cursor-pointer flex flex-col sm:flex-row gap-6 items-start sm:items-center"
             (click)="togglePanel(i)"
           >
             <div 
-              class="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110"
+              class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
               [ngClass]="{
-                'bg-gradient-to-br from-indigo-100 to-indigo-50 text-indigo-600 shadow-indigo-200': i % 3 === 0,
-                'bg-gradient-to-br from-sky-100 to-sky-50 text-sky-600 shadow-sky-200': i % 3 === 1,
-                'bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 shadow-emerald-200': i % 3 === 2
+                'bg-indigo-50 text-indigo-600': i % 3 === 0,
+                'bg-sky-50 text-sky-600': i % 3 === 1,
+                'bg-emerald-50 text-emerald-600': i % 3 === 2
               }"
             >
-              <img [src]="getIconoTecnica(i)" class="w-6 h-6 object-contain" [alt]="tecnica.nombre" />
+              <img [src]="getIconoTecnica(i)" class="w-8 h-8 object-contain" />
             </div>
 
             <div class="flex-1">
-              <h3 class="text-base font-semibold text-gray-800 group-hover:text-primary transition-colors">
-                {{ tecnica.nombre }}
-              </h3>
-              <p class="text-gray-400 text-xs mt-0.5" *ngIf="!panelAbierto[i]">Clic para ver más información...</p>
+              <h3 class="text-lg font-bold text-gray-800 mb-1">{{ tecnica.nombre }}</h3>
+              <p class="text-sm text-gray-500 line-clamp-2">{{ tecnica.descripcion }}</p>
             </div>
 
-            <button 
-              class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm"
-              [class.rotate-180]="panelAbierto[i]"
-              [class.bg-primary]="panelAbierto[i]"
-              [class.text-white]="panelAbierto[i]"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+            <div class="rounded-full p-2 bg-gray-50 text-gray-400 group-hover:bg-primary group-hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-300" [class.rotate-180]="panelAbierto[i]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
-            </button>
+            </div>
           </div>
 
-          <!-- Contenido expandible -->
           <div 
-            class="transition-all duration-500 ease-in-out bg-gradient-to-b from-gray-50/50 to-white"
-            [class.max-h-0]="!panelAbierto[i]"
-            [class.max-h-[1200px]]="panelAbierto[i]"
-            [class.overflow-hidden]="!panelAbierto[i]"
+            class="bg-gray-50/50 border-t border-gray-100 overflow-hidden transition-all duration-500"
+            [style.max-height]="panelAbierto[i] ? '1000px' : '0'"
           >
-            <div class="p-6 pt-4 flex flex-col gap-4 border-t border-gray-100">
-              <p class="text-gray-700 leading-relaxed text-sm">
-                {{ tecnica.descripcion }}
-              </p>
-
-              <div *ngIf="tecnica.explicacion" class="card-glass p-4 relative overflow-hidden">
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-primary-light rounded-r-full"></div>
-                <h4 class="text-primary font-semibold mb-2 flex items-center gap-2 text-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
+            <div class="p-6 pt-4 grid gap-4">
+              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <h4 class="text-sm font-bold text-primary mb-2 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   Cómo funciona
                 </h4>
-                <p class="text-gray-600 leading-relaxed text-xs">{{ tecnica.explicacion }}</p>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ tecnica.explicacion || 'Descripción detallada no disponible.' }}</p>
               </div>
 
-              <div *ngIf="tecnica.link_externo" class="text-center mt-1">
+              <div *ngIf="tecnica.link_externo" class="flex justify-end mt-2">
                 <a 
                   [href]="tecnica.link_externo" 
-                  target="_blank" 
-                  class="btn-liquid inline-flex px-6 py-2.5 rounded-full group text-xs"
+                  target="_blank"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 hover:text-primary transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                  </svg>
-                  <span>Explorar Herramienta</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
+                  Ver Herramienta Externa
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                 </a>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
+      </div>
     </div>
   </div>
 </div>

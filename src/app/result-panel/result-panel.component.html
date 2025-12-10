@@ -1,61 +1,72 @@
-<div 
-  class="card-glass p-5 text-center flex flex-col gap-4 min-h-[480px] sticky top-24 shadow-2xl"
->
-  <!-- Título -->
-  <div>
-    <h2 class="text-base font-semibold text-gray-800 tracking-tight">Tu Kit Didáctico</h2>
-    <div class="h-0.5 w-14 bg-gradient-to-r from-primary to-primary-light rounded-full mx-auto mt-1.5 shadow-sm"></div>
-  </div>
-
-  <!-- Estado vacío -->
-  <div *ngIf="!haySelecciones()" class="flex flex-col items-center justify-center flex-1 animate-fade-in">
-    <div class="relative">
-      <div class="absolute inset-0 bg-blue-100 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-      <img 
-        src="assets/personaje.png" 
-        class="relative w-44 h-auto object-contain opacity-90 hover:scale-105 transition-transform duration-500" 
-        alt="Personaje" 
-      />
+<div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sticky top-24 transition-all duration-300">
+  
+  <div class="mb-6 flex items-center gap-3 border-b border-gray-50 pb-4">
+    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
     </div>
-    <p class="text-gray-400 mt-6 font-medium text-xs">Selecciona opciones para comenzar</p>
+    <div>
+      <h2 class="text-lg font-bold text-gray-800 leading-none">Tu Selección</h2>
+      <p class="text-xs text-gray-400 font-medium mt-1">Resumen de filtros</p>
+    </div>
   </div>
 
-  <!-- Con selecciones -->
-  <ng-container *ngIf="haySelecciones()">
-    <div class="flex flex-col gap-2.5 w-full animate-fade-in-up max-h-[260px] overflow-y-auto pr-2">
-      <div 
-        class="flex items-center gap-2.5 p-3 rounded-xl bg-gradient-to-r from-blue-50/80 to-blue-50/40 border border-blue-100/50 text-gray-700 font-medium text-xs text-left transition-all duration-300 hover:translate-x-1 hover:shadow-md group"
-        *ngFor="let item of seleccionesOrdenadas; let i = index"
-      >
-        <span class="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-primary-dark text-white text-xs font-bold shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
-          {{ i + 1 }}
-        </span>
-        <span class="truncate text-gray-700">{{ item.opcion }}</span>
+  <div *ngIf="!haySelecciones()" class="py-8 flex flex-col items-center justify-center text-center animate-fade-in">
+    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3 text-gray-300">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <p class="text-sm text-gray-500 max-w-[200px]">Selecciona las opciones del formulario para configurar tu búsqueda.</p>
+  </div>
+
+  <div *ngIf="haySelecciones()" class="flex flex-col gap-3 mb-8 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+    <div 
+      *ngFor="let item of seleccionesOrdenadas" 
+      class="group flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all duration-200"
+    >
+      <div class="mt-0.5 w-5 h-5 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm group-hover:border-blue-200 group-hover:text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
       </div>
-    </div>
-
-    <!-- Botones -->
-    <div class="mt-auto pt-5 w-full flex flex-col gap-3">
-      
+      <div class="flex-1">
+        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">{{ item.pregunta }}</p>
+        <p class="text-sm font-semibold text-gray-700 group-hover:text-primary transition-colors">{{ item.opcion }}</p>
+      </div>
       <button 
-        class="btn-liquid py-3 px-5 text-sm w-full group"
-        (click)="onBuscarActividad()"
+        (click)="borrarSeleccion(item.pregunta)" 
+        class="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all"
+        title="Eliminar filtro"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <span>Buscar Actividad</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-        </svg>
-      </button>
-      
-      <button 
-        class="text-gray-400 hover:text-gray-600 text-xs font-medium transition-all duration-200 py-1.5 hover:scale-105"
-        (click)="reset()"
-      >
-        Borrar todo y reiniciar
       </button>
     </div>
-  </ng-container>
+  </div>
+
+  <div *ngIf="haySelecciones()" class="space-y-3 pt-4 border-t border-gray-50 animate-slide-up">
+    <button 
+      (click)="onBuscarActividad()" 
+      class="w-full py-3.5 px-4 bg-primary hover:bg-blue-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 group"
+    >
+      <span>Buscar Estrategias</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      </svg>
+    </button>
+    
+    <button 
+      (click)="reset()" 
+      class="w-full py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center justify-center gap-2"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+      Limpiar todo
+    </button>
+  </div>
+
 </div>
