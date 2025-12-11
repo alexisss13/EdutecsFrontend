@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://edutecsbackend.onrender.com/admin/'
+  apiUrl: 'https://edutecsbackend.onrender.com/api/'
 };
