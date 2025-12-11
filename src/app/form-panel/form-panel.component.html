@@ -26,7 +26,7 @@
         >
           <div 
             class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0"
-            [ngClass]="isExpanded(i) ? 'bg-primary text-white shadow-md shadow-primary/30 rotate-3' : 'bg-blue-50 text-primary group-hover:scale-105'"
+            [ngClass]="isExpanded(i) ? ' text-white shadow-md shadow-primary/30 rotate-3' : 'bg-blue-50 text-primary group-hover:scale-105'"
           >
             <img *ngIf="pregunta.icono" [src]="pregunta.icono" class="w-6 h-6 object-contain" alt="Icono" />
             <svg *ngIf="!pregunta.icono && pregunta.esOtrasOpciones" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,7 +42,7 @@
             </span>
           </div>
           <div class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm text-gray-400 transition-all duration-300 group-hover:border-primary/30"
-               [ngClass]="{ 'rotate-180 bg-primary text-white border-transparent': isExpanded(i) }">
+               [ngClass]="{ 'rotate-180 bg-primary  border-transparent': isExpanded(i) }">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
           </div>
         </div>

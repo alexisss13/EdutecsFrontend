@@ -15,46 +15,54 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
-  getCarreras(): Observable<Opcion[]> {
-    return this.http.get<Opcion[]>(this.apiUrl + 'carreras/');
+  // CAMBIO: Agregamos page_size=100 a todos los catálogos para traer todas las opciones
+
+  getCarreras(): Observable<any> {
+    const params = new HttpParams().set('page_size', '100');
+    return this.http.get<any>(this.apiUrl + 'carreras/', { params });
   }
 
-  getMomentos(): Observable<Opcion[]> {
-    return this.http.get<Opcion[]>(this.apiUrl + 'momentos/');
+  getMomentos(): Observable<any> {
+    const params = new HttpParams().set('page_size', '100');
+    return this.http.get<any>(this.apiUrl + 'momentos/', { params });
   }
 
-  getDuraciones(): Observable<Opcion[]> {
-    return this.http.get<Opcion[]>(this.apiUrl + 'duraciones/');
+  getDuraciones(): Observable<any> {
+    const params = new HttpParams().set('page_size', '100');
+    return this.http.get<any>(this.apiUrl + 'duraciones/', { params });
   }
 
-  getAgrupaciones(): Observable<Opcion[]> {
-    return this.http.get<Opcion[]>(this.apiUrl + 'agrupaciones/');
+  getAgrupaciones(): Observable<any> {
+    const params = new HttpParams().set('page_size', '100');
+    return this.http.get<any>(this.apiUrl + 'agrupaciones/', { params });
   }
 
-  getPensamientos(): Observable<Opcion[]> {
-    return this.http.get<Opcion[]>(this.apiUrl + 'pensamientos/');
+  getPensamientos(): Observable<any> {
+    const params = new HttpParams().set('page_size', '100');
+    return this.http.get<any>(this.apiUrl + 'pensamientos/', { params });
   }
 
-  getDificultades(): Observable<Opcion[]> {
-    return this.http.get<Opcion[]>(this.apiUrl + 'dificultades/');
+  getDificultades(): Observable<any> {
+    const params = new HttpParams().set('page_size', '100');
+    return this.http.get<any>(this.apiUrl + 'dificultades/', { params });
   }
+
+  // Métodos de búsqueda y filtrado (se mantienen igual o ajustas según necesidad)
 
   getTecnicasFiltradas(filters: { [key: string]: string }, page = 1, pageSize = 5): Observable<{ count: number; results: Tecnica[] }> {
     let params = new HttpParams()
       .set('page', page)
       .set('page_size', pageSize);
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value) {
-      // Ajusta las claves según los parámetros que espera tu API
-      params = params.set(key, value);
-    }
-  });
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) {
+        params = params.set(key, value);
+      }
+    });
 
-  return this.http.get<{ count: number; results: Tecnica[] }>(this.apiUrl + 'tecnicas/', { params });
-}
+    return this.http.get<{ count: number; results: Tecnica[] }>(this.apiUrl + 'tecnicas/', { params });
+  }
 
-
-  getTecnicasL(page = 1, pageSize = 5, carrera?: string, search?: string): Observable<{ count: number; results: Tecnica[] }> {
+  getTecnicasL(page = 1, pageSize = 15, carrera?: string, search?: string): Observable<{ count: number; results: Tecnica[] }> {
     let params = new HttpParams()
       .set('page', page)
       .set('page_size', pageSize);
@@ -64,9 +72,6 @@ export class ApiService {
   }
 
   getCarrerasL(): Observable<Paginacion<Opcion>> {
-  return this.http.get<Paginacion<Opcion>>(this.apiUrl + 'carreras/');
-}
-
-
-
+    return this.http.get<Paginacion<Opcion>>(this.apiUrl + 'carreras/');
+  }
 }

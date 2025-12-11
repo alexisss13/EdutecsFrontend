@@ -1,8 +1,11 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Tecnica } from '../models/Tecnica';
 import { ApiService } from '../api/api.service';
 import { SeleccionService } from '../seleccion.service';
+
+// Importaciones para PDF
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-result-activite',
@@ -10,12 +13,18 @@ import { SeleccionService } from '../seleccion.service';
   imports: [CommonModule],
   templateUrl: './result-activite.component.html',
 })
-export class ResultActiviteComponent {
+export class ResultActiviteComponent implements OnInit {
   @Output() nuevaBusqueda = new EventEmitter<void>();
 
   tecnicas: Tecnica[] = [];
   panelAbierto: boolean[] = [];
   seleccionesUsuario: { [pregunta: string]: string } = {};
+
+  // Colores corporativos (RGB)
+  private readonly COLOR_PRIMARY: [number, number, number] = [0, 178, 227]; // #00b2e3 (Azul Edutecs)
+  private readonly COLOR_GRAY_800: [number, number, number] = [31, 41, 55]; // #1f2937 (Texto oscuro)
+  private readonly COLOR_GRAY_500: [number, number, number] = [107, 114, 128]; // #6b7280 (Texto secundario)
+  private readonly COLOR_GRAY_200: [number, number, number] = [229, 231, 235]; // #e5e7eb (Líneas)
 
   constructor(
     private seleccionService: SeleccionService,
@@ -64,5 +73,199 @@ export class ResultActiviteComponent {
       'assets/icono-listo.png',
     ];
     return iconos[index % iconos.length];
+  }
+
+  // --- LÓGICA DE PDF ACTUALIZADA ---
+
+  async descargarPDF() {
+    const doc = new jsPDF();
+    const margenX = 20;
+    let cursorY = 20; 
+    const anchoPagina = doc.internal.pageSize.width;
+    const anchoUtil = anchoPagina - (margenX * 2);
+
+    // --- CONFIGURACIÓN DE DIMENSIONES DEL ENCABEZADO ---
+    const logoAncho = 35; 
+    const logoAlto = 10;
+    const separacion = 5; 
+    
+    const lineaX = margenX + logoAncho + separacion; 
+    const textoX = lineaX + separacion; 
+
+    // 1. CARGAR LOGO (Tecsup.png)
+    try {
+        const logoData = await this.loadImage('assets/Tecsup.png'); 
+        doc.addImage(logoData, 'PNG', margenX, 15, logoAncho, logoAlto); 
+        
+        doc.setDrawColor(...this.COLOR_GRAY_200);
+        doc.setLineWidth(0.5);
+        doc.line(lineaX, 15, lineaX, 25); 
+
+    } catch (e) {
+        console.warn('No se pudo cargar el logo Tecsup.png', e);
+    }
+
+    // 2. ENCABEZADO
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(...this.COLOR_GRAY_800);
+    doc.text('Edutecs', textoX, 19); 
+
+    doc.setFont('helvetica', 'bold'); 
+    doc.setFontSize(9);
+    doc.setTextColor(...this.COLOR_PRIMARY);
+    doc.text('DOCENTES', textoX, 23); 
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...this.COLOR_GRAY_500);
+    const fecha = new Date().toLocaleDateString();
+    doc.text(fecha, anchoPagina - margenX, 20, { align: 'right' });
+
+    cursorY += 20; 
+
+    // 3. SECCIÓN: FILTROS APLICADOS
+    doc.setFillColor(249, 250, 251); 
+    doc.setDrawColor(...this.COLOR_GRAY_200);
+    doc.roundedRect(margenX, cursorY, anchoUtil, 30, 3, 3, 'FD');
+    
+    let filtroY = cursorY + 8;
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...this.COLOR_GRAY_800);
+    doc.text('Filtros seleccionados:', margenX + 5, filtroY);
+    filtroY += 6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...this.COLOR_GRAY_500);
+
+    const filtros = Object.entries(this.seleccionesUsuario);
+    let filtrosTexto = "";
+
+    filtros.forEach(([pregunta, respuesta]) => {
+        if (!respuesta) return;
+        let label = pregunta;
+        if (pregunta.includes('carrera')) label = 'Carrera';
+        else if (pregunta.includes('momento')) label = 'Momento';
+        else if (pregunta.includes('durará')) label = 'Duración';
+        else if (pregunta.includes('organizarás')) label = 'Agrupación';
+        else if (pregunta.includes('pensamiento')) label = 'Pensamiento';
+        else if (pregunta.includes('dificultad')) label = 'Dificultad';
+        
+        filtrosTexto += `${label}: ${respuesta}  |  `;
+    });
+
+    if (filtrosTexto.endsWith('  |  ')) filtrosTexto = filtrosTexto.slice(0, -5);
+    
+    const splitFiltros = doc.splitTextToSize(filtrosTexto, anchoUtil - 10);
+    doc.text(splitFiltros, margenX + 5, filtroY);
+
+    cursorY += 40; 
+
+    // 4. RESULTADOS (TÉCNICAS DETALLADAS)
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...this.COLOR_GRAY_800);
+    doc.text('Estrategias Recomendadas', margenX, cursorY);
+    cursorY += 10;
+
+    this.tecnicas.forEach((tecnica, index) => {
+        if (cursorY > 250) {
+            doc.addPage();
+            cursorY = 20;
+        }
+
+        // TÍTULO TÉCNICA
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(...this.COLOR_PRIMARY);
+        doc.text(`${index + 1}. ${tecnica.nombre}`, margenX, cursorY);
+        cursorY += 6;
+
+        // --- METADATOS (NUEVO) ---
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(...this.COLOR_GRAY_800);
+
+        // Helper para arrays
+        const getStr = (arr?: string[]) => arr && arr.length > 0 ? arr.join(', ') : '-';
+
+        // Línea 1
+        const meta1 = `Duración: ${getStr(tecnica.duraciones)}   |   Dificultad: ${getStr(tecnica.dificultades)}   |   Momento: ${getStr(tecnica.momentos)}`;
+        doc.text(meta1, margenX, cursorY);
+        cursorY += 4;
+
+        // Línea 2
+        const meta2 = `Agrupación: ${getStr(tecnica.agrupaciones)}   |   Pensamiento: ${getStr(tecnica.pensamientos)}`;
+        doc.text(meta2, margenX, cursorY);
+        cursorY += 6; // Espacio antes de la descripción
+
+        // DESCRIPCIÓN
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(...this.COLOR_GRAY_800);
+        const descripcionLines = doc.splitTextToSize(tecnica.descripcion, anchoUtil);
+        doc.text(descripcionLines, margenX, cursorY);
+        cursorY += (descripcionLines.length * 4) + 4; 
+
+        // CÓMO FUNCIONA (Explicación)
+        if (tecnica.explicacion) {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(...this.COLOR_GRAY_800);
+            doc.text('Cómo funciona:', margenX, cursorY);
+            cursorY += 4;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(...this.COLOR_GRAY_500); 
+            
+            const explicacionLines = doc.splitTextToSize(tecnica.explicacion, anchoUtil);
+            doc.text(explicacionLines, margenX, cursorY);
+            cursorY += (explicacionLines.length * 4) + 4;
+        }
+
+        // LÍNEA SEPARADORA
+        cursorY += 2;
+        doc.setDrawColor(...this.COLOR_GRAY_200);
+        doc.setLineWidth(0.1);
+        doc.line(margenX, cursorY, margenX + anchoUtil, cursorY);
+        cursorY += 8; 
+    });
+
+    // PIE DE PÁGINA
+    const totalPages = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Página ${i} de ${totalPages} - Generado por Edutecs`, anchoPagina / 2, 285, { align: 'center' });
+    }
+
+    doc.save('Estrategias_Edutecs.pdf');
+  }
+
+  // Método auxiliar para cargar imágenes
+  private loadImage(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = url;
+      img.crossOrigin = 'Anonymous'; 
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+        } else {
+            reject('No se pudo crear contexto canvas');
+        }
+      };
+      img.onerror = (e) => reject(e);
+    });
   }
 }
