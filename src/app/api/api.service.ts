@@ -71,6 +71,15 @@ export class ApiService {
     return this.http.get<{ count: number; results: Tecnica[] }>(this.apiUrl + 'tecnicas/', { params });
   }
 
+  // Llama al endpoint nuevo que devuelve ARRAY directo (Tecnica[]), sin paginación
+  getTecnicasExportar(carrera?: string, search?: string): Observable<Tecnica[]> {
+    let params = new HttpParams(); // Sin page ni page_size
+    if (carrera) params = params.set('carreras__nombre', carrera);
+    if (search) params = params.set('search', search);
+    
+    return this.http.get<Tecnica[]>(this.apiUrl + 'tecnicas/exportar/', { params });
+  }
+
   getCarrerasL(): Observable<Paginacion<Opcion>> {
     return this.http.get<Paginacion<Opcion>>(this.apiUrl + 'carreras/');
   }

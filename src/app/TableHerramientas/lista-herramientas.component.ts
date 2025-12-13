@@ -29,46 +29,40 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
   // Modal
   tecnicaSeleccionada: Tecnica | null = null;
 
-  // Variables Spinner
+  // Variables Spinner General (Carga de página)
   loading: boolean = false;
   mostrarMensajeDemora: boolean = false;
   private timerDemora: any;
 
-  // Estilos PDF (Colores corporativos)
-  private readonly COLOR_PRIMARY: [number, number, number] = [0, 178, 227]; // Azul
-  private readonly COLOR_GRAY_800: [number, number, number] = [31, 41, 55]; // Gris oscuro
-  private readonly COLOR_GRAY_500: [number, number, number] = [107, 114, 128]; // Gris medio
-  private readonly COLOR_GRAY_200: [number, number, number] = [229, 231, 235]; // Gris claro
+  // Variable Spinner PDF (Carga de descarga) <--- NUEVO
+  loadingPdf: boolean = false;
+
+  // Estilos PDF
+  private readonly COLOR_PRIMARY: [number, number, number] = [0, 178, 227]; 
+  private readonly COLOR_GRAY_800: [number, number, number] = [31, 41, 55]; 
+  private readonly COLOR_GRAY_500: [number, number, number] = [107, 114, 128]; 
+  private readonly COLOR_GRAY_200: [number, number, number] = [229, 231, 235]; 
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
-    // Carga de carreras con soporte para lista directa o paginada
     this.apiService.getCarrerasL().subscribe({
       next: (data: any) => { 
-        if (Array.isArray(data)) {
-            this.carreras = data;
-        } else if (data && data.results) {
-            this.carreras = data.results;
-        } else {
-            this.carreras = [];
-        }
+        if (Array.isArray(data)) { this.carreras = data; } 
+        else if (data && data.results) { this.carreras = data.results; } 
+        else { this.carreras = []; }
       },
       error: () => { this.carreras = []; }
     });
-
     this.cargarTecnicas();
   }
 
-  ngOnDestroy(): void {
-    this.limpiarTimer();
-  }
+  ngOnDestroy(): void { this.limpiarTimer(); }
 
   cargarTecnicas(): void {
     this.loading = true;
     this.mostrarMensajeDemora = false;
     this.limpiarTimer();
-    // Limpiamos la lista visualmente mientras carga
     this.tecnicas = []; 
 
     this.timerDemora = setTimeout(() => {
@@ -99,10 +93,7 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
   }
 
   private limpiarTimer(): void {
-    if (this.timerDemora) {
-        clearTimeout(this.timerDemora);
-        this.timerDemora = null;
-    }
+    if (this.timerDemora) { clearTimeout(this.timerDemora); this.timerDemora = null; }
   }
 
   onFilterChange(): void {
@@ -123,32 +114,38 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
     const tieneFiltros = this.busqueda.trim() !== '' || this.carreraSeleccionada !== '';
     
     if (!tieneFiltros) {
-      const confirmar = confirm(`No has seleccionado ningún filtro.\n\n¿Deseas descargar el catálogo completo (${this.totalTecnicas} técnicas)?\n\nTip: Puedes filtrar por Carrera o Nombre para un reporte más específico.`);
+      const confirmar = confirm(`¿Deseas descargar el catálogo completo?\n\nSe generará un PDF con todas las técnicas disponibles.`);
       if (!confirmar) return;
     }
 
-    // Nota: Aquí no activo el 'loading' principal para no bloquear la UI entera mientras se genera el PDF,
-    // pero podrías hacerlo si lo prefieres.
-    this.apiService.getTecnicasL(1, 1000, this.carreraSeleccionada, this.busqueda).subscribe({
-      next: async (data) => {
-        if (data.results.length > 0) {
-          await this.generarPDF(data.results);
+    // Activar estado de carga del PDF
+    this.loadingPdf = true; 
+
+    // Usamos el endpoint sin paginación
+    this.apiService.getTecnicasExportar(this.carreraSeleccionada, this.busqueda).subscribe({
+      next: async (data: Tecnica[]) => {
+        if (data && data.length > 0) {
+          await this.generarPDF(data);
         } else {
           alert('No hay datos para generar el reporte.');
         }
+        this.loadingPdf = false; // Desactivar al terminar
       },
-      error: () => alert('Error al obtener los datos para el PDF.')
+      error: () => {
+        alert('Error al obtener los datos para el PDF.');
+        this.loadingPdf = false; // Desactivar al fallar
+      }
     });
   }
 
   async generarPDF(datosReporte: Tecnica[]) {
+    // ... (Tu lógica de generación de PDF se mantiene igual) ...
     const doc = new jsPDF();
     const margenX = 20;
     let cursorY = 20; 
     const anchoPagina = doc.internal.pageSize.width;
     const anchoUtil = anchoPagina - (margenX * 2);
 
-    // --- ENCABEZADO ---
     const logoAncho = 35; 
     const logoAlto = 10;
     const separacion = 5;
@@ -181,7 +178,6 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
 
     cursorY += 20; 
 
-    // --- SECCIÓN DE FILTROS ---
     doc.setFillColor(249, 250, 251); 
     doc.setDrawColor(...this.COLOR_GRAY_200);
     doc.roundedRect(margenX, cursorY, anchoUtil, 25, 3, 3, 'FD');
@@ -202,7 +198,6 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
     doc.text(textoFiltros, margenX + 5, cursorY + 16);
     cursorY += 35; 
 
-    // --- LISTADO DE TÉCNICAS (DETALLADO) ---
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...this.COLOR_GRAY_800);
@@ -210,46 +205,38 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
     cursorY += 10;
 
     datosReporte.forEach((tecnica, index) => {
-        // Verificar salto de página
         if (cursorY > 250) {
             doc.addPage();
             cursorY = 20;
         }
 
-        // 1. TÍTULO
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
         doc.setTextColor(...this.COLOR_PRIMARY);
         doc.text(`${index + 1}. ${tecnica.nombre}`, margenX, cursorY);
         cursorY += 6;
 
-        // 2. METADATOS (Duración, Dificultad, Momento, etc.)
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
         doc.setTextColor(...this.COLOR_GRAY_800);
 
-        // Helper para obtener string de arrays
         const getStr = (arr?: string[]) => arr && arr.length > 0 ? arr.join(', ') : '-';
 
-        // Línea 1 de metadatos
         const meta1 = `Duración: ${getStr(tecnica.duraciones)}   |   Dificultad: ${getStr(tecnica.dificultades)}   |   Momento: ${getStr(tecnica.momentos)}`;
         doc.text(meta1, margenX, cursorY);
         cursorY += 4;
 
-        // Línea 2 de metadatos
         const meta2 = `Agrupación: ${getStr(tecnica.agrupaciones)}   |   Pensamiento: ${getStr(tecnica.pensamientos)}`;
         doc.text(meta2, margenX, cursorY);
-        cursorY += 6; // Espacio extra antes de la descripción
+        cursorY += 6;
 
-        // 3. DESCRIPCIÓN
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
-        doc.setTextColor(...this.COLOR_GRAY_800); // Volver al gris oscuro normal
+        doc.setTextColor(...this.COLOR_GRAY_800);
         const descLines = doc.splitTextToSize(tecnica.descripcion, anchoUtil);
         doc.text(descLines, margenX, cursorY);
         cursorY += (descLines.length * 4) + 4;
 
-        // 4. EXPLICACIÓN (Cómo funciona)
         if (tecnica.explicacion) {
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(9);
@@ -259,20 +246,18 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
 
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(9);
-            doc.setTextColor(...this.COLOR_GRAY_500); // Texto secundario (gris más claro)
+            doc.setTextColor(...this.COLOR_GRAY_500); 
             const expLines = doc.splitTextToSize(tecnica.explicacion, anchoUtil);
             doc.text(expLines, margenX, cursorY);
             cursorY += (expLines.length * 4) + 4;
         }
 
-        // Línea separadora
         doc.setDrawColor(...this.COLOR_GRAY_200);
         doc.setLineWidth(0.1);
         doc.line(margenX, cursorY, margenX + anchoUtil, cursorY);
         cursorY += 8;
     });
 
-    // Pie de página
     const totalPages = (doc as any).internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -303,7 +288,6 @@ export class ListaHerramientasComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- MODAL ---
   abrirDetalle(tecnica: Tecnica): void {
     this.tecnicaSeleccionada = tecnica;
     document.body.style.overflow = 'hidden';
