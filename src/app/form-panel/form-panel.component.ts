@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs'; // <--- Importante para la suscripción
 import { SeleccionService } from '../seleccion.service';
 import { Opcion } from '../models/Opcion';
 // Importaciones de tus componentes
@@ -18,7 +19,6 @@ interface Pregunta {
 @Component({
   selector: 'app-form-panel',
   standalone: true,
-  // Agregamos ResultPanelComponent y ResultActiviteComponent aquí
   imports: [
     CommonModule, 
     InstructionsComponent, 
@@ -27,13 +27,16 @@ interface Pregunta {
   ],
   templateUrl: './form-panel.component.html',
 })
-export class FormPanelComponent implements OnInit {
+export class FormPanelComponent implements OnInit, OnDestroy { // <--- Implementar OnDestroy
   
   // Variable para controlar si mostramos el formulario o los resultados
   mostrarResultados = false;
 
   expandedIndex: number | null = null;
   reemplazoOtrasOpciones = false; 
+  
+  // Suscripción para escuchar cambios externos (como el botón Reset)
+  private subscription: Subscription = new Subscription();
 
   preguntas: Pregunta[] = [
     {
@@ -88,23 +91,37 @@ export class FormPanelComponent implements OnInit {
     this.cargarOrganizaciones();
     this.cargarPensamientos();
     this.cargarDificultades();
+
+    // --- ESCUCHAR CAMBIOS DEL SERVICIO ---
+    // Esto hace que si el ResultPanel limpia todo, este componente se entere y desmarque visualmente.
+    this.subscription.add(
+      this.seleccionService.selecciones$.subscribe(selecciones => {
+        // Convertimos el objeto { pregunta: respuesta } de vuelta al array que usa este componente
+        this.selectedOpcionesOrdenadas = Object.entries(selecciones).map(([pregunta, opcion]) => ({
+          pregunta,
+          opcion
+        }));
+      })
+    );
   }
 
-  // --- MÉTODOS PARA CONTROL DE VISTAS (NUEVOS) ---
+  ngOnDestroy(): void {
+    // Importante: Desuscribirse para evitar fugas de memoria
+    this.subscription.unsubscribe();
+  }
+
+  // --- MÉTODOS PARA CONTROL DE VISTAS ---
 
   onBuscar(): void {
     this.mostrarResultados = true;
-    // Scroll suave al inicio para ver los resultados desde arriba
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   onResetBusqueda(): void {
     this.mostrarResultados = false;
-    // Si quisieras limpiar los filtros al volver, descomenta esto:
-    // this.seleccionService.reset();
   }
 
-  // --- FIN MÉTODOS NUEVOS ---
+  // --- MÉTODOS DE CARGA DE DATOS ---
 
   private cargarCarreras(): void {
     this.seleccionService.getCarreras().subscribe((carreras) => {
@@ -198,6 +215,7 @@ export class FormPanelComponent implements OnInit {
   }
 
   selectOpcion(pregunta: Pregunta, opcion: Opcion): void {
+    // Actualizamos el array local
     const index = this.selectedOpcionesOrdenadas.findIndex(sel => sel.pregunta === pregunta.texto);
 
     if (index !== -1) {
@@ -206,6 +224,7 @@ export class FormPanelComponent implements OnInit {
       this.selectedOpcionesOrdenadas.push({ pregunta: pregunta.texto, opcion: opcion.nombre });
     }
 
+    // Convertimos a objeto y enviamos al servicio
     const seleccionesObj = this.selectedOpcionesOrdenadas.reduce((acc, cur) => {
       acc[cur.pregunta] = cur.opcion;
       return acc;
