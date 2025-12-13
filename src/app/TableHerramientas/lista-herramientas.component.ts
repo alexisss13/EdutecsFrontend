@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Tecnica } from '../models/Tecnica';
 import { Opcion } from '../models/Opcion';
 import { ApiService } from '../api/api.service';
@@ -12,7 +12,7 @@ import jsPDF from 'jspdf';
   imports: [CommonModule, FormsModule],
   templateUrl: './lista-herramientas.component.html',
 })
-export class ListaHerramientasComponent implements OnInit {
+export class ListaHerramientasComponent implements OnInit, OnDestroy {
 
   tecnicas: Tecnica[] = [];
   carreras: Opcion[] = [];
@@ -28,6 +28,11 @@ export class ListaHerramientasComponent implements OnInit {
 
   // Modal
   tecnicaSeleccionada: Tecnica | null = null;
+
+  // Variables Spinner
+  loading: boolean = false;
+  mostrarMensajeDemora: boolean = false;
+  private timerDemora: any;
 
   // Estilos PDF (Colores corporativos)
   private readonly COLOR_PRIMARY: [number, number, number] = [0, 178, 227]; // Azul
@@ -55,7 +60,21 @@ export class ListaHerramientasComponent implements OnInit {
     this.cargarTecnicas();
   }
 
+  ngOnDestroy(): void {
+    this.limpiarTimer();
+  }
+
   cargarTecnicas(): void {
+    this.loading = true;
+    this.mostrarMensajeDemora = false;
+    this.limpiarTimer();
+    // Limpiamos la lista visualmente mientras carga
+    this.tecnicas = []; 
+
+    this.timerDemora = setTimeout(() => {
+        if (this.loading) this.mostrarMensajeDemora = true;
+    }, 6000);
+
     this.apiService.getTecnicasL(this.paginaActual, this.pageSize, this.carreraSeleccionada, this.busqueda)
       .subscribe({
         next: (data) => {
@@ -63,12 +82,27 @@ export class ListaHerramientasComponent implements OnInit {
           this.totalTecnicas = data.count;
           this.totalPaginas = Math.ceil(this.totalTecnicas / this.pageSize);
           this.paginas = Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
+          this.finalizarCarga();
         },
         error: () => {
           this.tecnicas = [];
           this.totalTecnicas = 0;
+          this.finalizarCarga();
         }
       });
+  }
+
+  private finalizarCarga(): void {
+    this.loading = false;
+    this.mostrarMensajeDemora = false;
+    this.limpiarTimer();
+  }
+
+  private limpiarTimer(): void {
+    if (this.timerDemora) {
+        clearTimeout(this.timerDemora);
+        this.timerDemora = null;
+    }
   }
 
   onFilterChange(): void {
@@ -93,7 +127,8 @@ export class ListaHerramientasComponent implements OnInit {
       if (!confirmar) return;
     }
 
-    // Pedimos 1000 items para intentar traer todo el reporte
+    // Nota: Aquí no activo el 'loading' principal para no bloquear la UI entera mientras se genera el PDF,
+    // pero podrías hacerlo si lo prefieres.
     this.apiService.getTecnicasL(1, 1000, this.carreraSeleccionada, this.busqueda).subscribe({
       next: async (data) => {
         if (data.results.length > 0) {

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Tecnica } from '../models/Tecnica';
 import { ApiService } from '../api/api.service';
@@ -13,18 +13,23 @@ import jsPDF from 'jspdf';
   imports: [CommonModule],
   templateUrl: './result-activite.component.html',
 })
-export class ResultActiviteComponent implements OnInit {
+export class ResultActiviteComponent implements OnInit, OnDestroy {
   @Output() nuevaBusqueda = new EventEmitter<void>();
 
   tecnicas: Tecnica[] = [];
   panelAbierto: boolean[] = [];
   seleccionesUsuario: { [pregunta: string]: string } = {};
 
+  // Variables para Spinner y Timeout
+  loading: boolean = false;
+  mostrarMensajeDemora: boolean = false;
+  private timerDemora: any;
+
   // Colores corporativos (RGB)
-  private readonly COLOR_PRIMARY: [number, number, number] = [0, 178, 227]; // #00b2e3 (Azul Edutecs)
-  private readonly COLOR_GRAY_800: [number, number, number] = [31, 41, 55]; // #1f2937 (Texto oscuro)
-  private readonly COLOR_GRAY_500: [number, number, number] = [107, 114, 128]; // #6b7280 (Texto secundario)
-  private readonly COLOR_GRAY_200: [number, number, number] = [229, 231, 235]; // #e5e7eb (Líneas)
+  private readonly COLOR_PRIMARY: [number, number, number] = [0, 178, 227];
+  private readonly COLOR_GRAY_800: [number, number, number] = [31, 41, 55];
+  private readonly COLOR_GRAY_500: [number, number, number] = [107, 114, 128];
+  private readonly COLOR_GRAY_200: [number, number, number] = [229, 231, 235];
 
   constructor(
     private seleccionService: SeleccionService,
@@ -38,11 +43,28 @@ export class ResultActiviteComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.limpiarTimer();
+  }
+
   onNuevaBusqueda() {
     this.nuevaBusqueda.emit();
   }
 
   buscarTecnicasCoincidentes(): void {
+    // Activar carga
+    this.loading = true;
+    this.mostrarMensajeDemora = false;
+    this.limpiarTimer();
+    this.tecnicas = []; // Limpiar vista anterior
+
+    // Timer de 6 segundos para mostrar mensaje de demora
+    this.timerDemora = setTimeout(() => {
+        if (this.loading) {
+            this.mostrarMensajeDemora = true;
+        }
+    }, 6000);
+
     const filtrosApi = {
       'carreras__nombre': this.seleccionesUsuario['¿De qué carrera son tus estudiantes?'] || '',
       'momentos__nombre': this.seleccionesUsuario['¿En qué momento de la clase usarás la actividad?'] || '',
@@ -52,10 +74,30 @@ export class ResultActiviteComponent implements OnInit {
       'dificultades__nombre': this.seleccionesUsuario['Elige la dificultad'] || '',
     };
 
-    this.apiService.getTecnicasFiltradas(filtrosApi).subscribe(data => {
-      this.tecnicas = data.results;
-      this.inicializarPaneles();
+    this.apiService.getTecnicasFiltradas(filtrosApi).subscribe({
+      next: (data) => {
+        this.tecnicas = data.results;
+        this.inicializarPaneles();
+        this.finalizarCarga();
+      },
+      error: (err) => {
+        console.error('Error al obtener técnicas:', err);
+        this.finalizarCarga();
+      }
     });
+  }
+
+  private finalizarCarga(): void {
+    this.loading = false;
+    this.mostrarMensajeDemora = false;
+    this.limpiarTimer();
+  }
+
+  private limpiarTimer(): void {
+    if (this.timerDemora) {
+      clearTimeout(this.timerDemora);
+      this.timerDemora = null;
+    }
   }
 
   inicializarPaneles(): void {
@@ -75,8 +117,7 @@ export class ResultActiviteComponent implements OnInit {
     return iconos[index % iconos.length];
   }
 
-  // --- LÓGICA DE PDF ACTUALIZADA ---
-
+  // --- LÓGICA DE PDF ORIGINAL ---
   async descargarPDF() {
     const doc = new jsPDF();
     const margenX = 20;
@@ -84,7 +125,6 @@ export class ResultActiviteComponent implements OnInit {
     const anchoPagina = doc.internal.pageSize.width;
     const anchoUtil = anchoPagina - (margenX * 2);
 
-    // --- CONFIGURACIÓN DE DIMENSIONES DEL ENCABEZADO ---
     const logoAncho = 35; 
     const logoAlto = 10;
     const separacion = 5; 
@@ -92,7 +132,6 @@ export class ResultActiviteComponent implements OnInit {
     const lineaX = margenX + logoAncho + separacion; 
     const textoX = lineaX + separacion; 
 
-    // 1. CARGAR LOGO (Tecsup.png)
     try {
         const logoData = await this.loadImage('assets/Tecsup.png'); 
         doc.addImage(logoData, 'PNG', margenX, 15, logoAncho, logoAlto); 
@@ -105,7 +144,6 @@ export class ResultActiviteComponent implements OnInit {
         console.warn('No se pudo cargar el logo Tecsup.png', e);
     }
 
-    // 2. ENCABEZADO
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.setTextColor(...this.COLOR_GRAY_800);
@@ -124,7 +162,6 @@ export class ResultActiviteComponent implements OnInit {
 
     cursorY += 20; 
 
-    // 3. SECCIÓN: FILTROS APLICADOS
     doc.setFillColor(249, 250, 251); 
     doc.setDrawColor(...this.COLOR_GRAY_200);
     doc.roundedRect(margenX, cursorY, anchoUtil, 30, 3, 3, 'FD');
@@ -164,7 +201,6 @@ export class ResultActiviteComponent implements OnInit {
 
     cursorY += 40; 
 
-    // 4. RESULTADOS (TÉCNICAS DETALLADAS)
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...this.COLOR_GRAY_800);
@@ -177,32 +213,26 @@ export class ResultActiviteComponent implements OnInit {
             cursorY = 20;
         }
 
-        // TÍTULO TÉCNICA
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(13);
         doc.setTextColor(...this.COLOR_PRIMARY);
         doc.text(`${index + 1}. ${tecnica.nombre}`, margenX, cursorY);
         cursorY += 6;
 
-        // --- METADATOS (NUEVO) ---
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
         doc.setTextColor(...this.COLOR_GRAY_800);
 
-        // Helper para arrays
         const getStr = (arr?: string[]) => arr && arr.length > 0 ? arr.join(', ') : '-';
 
-        // Línea 1
         const meta1 = `Duración: ${getStr(tecnica.duraciones)}   |   Dificultad: ${getStr(tecnica.dificultades)}   |   Momento: ${getStr(tecnica.momentos)}`;
         doc.text(meta1, margenX, cursorY);
         cursorY += 4;
 
-        // Línea 2
         const meta2 = `Agrupación: ${getStr(tecnica.agrupaciones)}   |   Pensamiento: ${getStr(tecnica.pensamientos)}`;
         doc.text(meta2, margenX, cursorY);
-        cursorY += 6; // Espacio antes de la descripción
+        cursorY += 6;
 
-        // DESCRIPCIÓN
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
         doc.setTextColor(...this.COLOR_GRAY_800);
@@ -210,7 +240,6 @@ export class ResultActiviteComponent implements OnInit {
         doc.text(descripcionLines, margenX, cursorY);
         cursorY += (descripcionLines.length * 4) + 4; 
 
-        // CÓMO FUNCIONA (Explicación)
         if (tecnica.explicacion) {
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(9);
@@ -227,7 +256,6 @@ export class ResultActiviteComponent implements OnInit {
             cursorY += (explicacionLines.length * 4) + 4;
         }
 
-        // LÍNEA SEPARADORA
         cursorY += 2;
         doc.setDrawColor(...this.COLOR_GRAY_200);
         doc.setLineWidth(0.1);
@@ -235,7 +263,6 @@ export class ResultActiviteComponent implements OnInit {
         cursorY += 8; 
     });
 
-    // PIE DE PÁGINA
     const totalPages = (doc as any).internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
@@ -247,7 +274,6 @@ export class ResultActiviteComponent implements OnInit {
     doc.save('Estrategias_Edutecs.pdf');
   }
 
-  // Método auxiliar para cargar imágenes
   private loadImage(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const img = new Image();

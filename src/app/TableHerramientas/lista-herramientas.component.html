@@ -53,7 +53,24 @@
 
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px]">
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 animate-fade-in min-h-[400px]">
+    <div class="relative w-12 h-12">
+        <div class="absolute top-0 left-0 w-full h-full border-4 border-gray-200 rounded-full"></div>
+        <div class="absolute top-0 left-0 w-full h-full border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+    </div>
+    
+    <div *ngIf="mostrarMensajeDemora" class="mt-6 p-4 bg-amber-50 border border-amber-100 rounded-xl max-w-sm text-center animate-fade-in-up shadow-sm">
+        <div class="flex items-center justify-center gap-2 text-amber-600 font-bold mb-1 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Conexión lenta</span>
+        </div>
+        <p class="text-xs text-amber-700 mt-1">Estamos conectando con el servidor, por favor espera...</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px] animate-fade-in">
     
     <div *ngIf="tecnicas.length === 0" class="col-span-full flex flex-col items-center justify-center py-16 text-gray-400 bg-white/50 rounded-3xl border border-dashed border-gray-200">
       <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
@@ -86,8 +103,8 @@
       </p>
 
       <div class="flex flex-wrap gap-2 mt-auto">
-         <span *ngIf="tecnica.duraciones && tecnica.duraciones.length > 0" 
-         class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-100 flex items-center gap-1">
+          <span *ngIf="tecnica.duraciones && tecnica.duraciones.length > 0" 
+          class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-100 flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             {{ tecnica.duraciones[0] }}
         </span>
@@ -100,7 +117,7 @@
     </div>
   </div>
 
-  <div class="mt-0 flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-100" *ngIf="totalTecnicas > 0">
+  <div class="mt-0 flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-100" *ngIf="!loading && totalTecnicas > 0">
     
     <div class="text-sm text-gray-500 order-2 md:order-1">
       Mostrando 
